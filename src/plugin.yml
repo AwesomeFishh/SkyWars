@@ -1,0 +1,12 @@
+name: SkyWars
+version: 1.0.0
+main: me.awesomefishh.skywars.Main
+depend: [WorldEdit]
+commands:
+   skywars:
+      description: Main command for this plugin!
+      aliases: [sw, skyw, swars]
+
+permissions:
+   skywars.multiplier.*:
+      default: false

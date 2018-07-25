@@ -1,0 +1,28 @@
+#Database Credentials
+username: root
+host: localhost
+port: 3306
+database: skywars
+password: Jorentje08
+
+#Prefix in chat
+chat-prefix: "&eSkyWars &l>> &f"
+
+#What world has to be reset after every game?
+world: "SkyWars"
+
+#When the minimum amount of players is reached, how long will the countdown be before they are teleported to
+#their islands?
+lobby-countdown: 30
+
+#Coins
+coins-per-kill: 12
+coins-per-win: 100
+
+#Multipliers
+coin-multipliers:
+   1: multiplier.1
+   2: multiplier.2
+   3: multiplier.3
+   4: multiplier.4
+   5: multiplier.5
