@@ -4,15 +4,14 @@ import me.awesomefishh.skywars.Main;
 import me.awesomefishh.skywars.game.GameManager;
 import me.awesomefishh.skywars.game.GameState;
 import me.awesomefishh.skywars.player.PlayerManager;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
+import org.bukkit.*;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.UUID;
 
@@ -80,6 +79,10 @@ public class JoinListener implements Listener {
             if (gameManager.getPlayersAlive().size() >= arenaConfig.getInt("arenas." + gameManager.getChosenArena() + ".minplayers")) {
                 plugin.getLobbyCountdown().initiate();
             }
+
+            ItemStack kitItem = new ItemStack(Material.PAPER);
+            kitItem.getItemMeta().setDisplayName(ChatColor.GOLD + "Choose a kit!");
+            player.getInventory().setItem(4, kitItem);
 
             return;
         }

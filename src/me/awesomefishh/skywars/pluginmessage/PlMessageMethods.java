@@ -12,12 +12,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class MessageMethods {
+public class PlMessageMethods {
 
     private Main plugin;
     private GameManager gameManager;
 
-    public MessageMethods() {
+    public PlMessageMethods() {
         plugin = Main.getInstance();
         gameManager = plugin.getGameManager();
     }

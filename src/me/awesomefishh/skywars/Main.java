@@ -6,14 +6,13 @@ import me.awesomefishh.skywars.configurations.ConfigManager;
 import me.awesomefishh.skywars.database.DatabaseManager;
 import me.awesomefishh.skywars.game.GameManager;
 import me.awesomefishh.skywars.game.GameState;
-import me.awesomefishh.skywars.listeners.EntityDamageListener;
-import me.awesomefishh.skywars.listeners.JoinListener;
-import me.awesomefishh.skywars.listeners.QuitListener;
-import me.awesomefishh.skywars.listeners.UtilityListeners;
+import me.awesomefishh.skywars.kits.KitMain;
+import me.awesomefishh.skywars.listeners.*;
 import me.awesomefishh.skywars.player.PlayerManager;
-import me.awesomefishh.skywars.pluginmessage.MessageListener;
-import me.awesomefishh.skywars.pluginmessage.MessageMethods;
+import me.awesomefishh.skywars.pluginmessage.PlMessageListener;
+import me.awesomefishh.skywars.pluginmessage.PlMessageMethods;
 import me.awesomefishh.skywars.schedulers.LobbyCountdown;
+import me.awesomefishh.skywars.utils.KitMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -22,6 +21,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class Main extends JavaPlugin {
@@ -32,37 +32,31 @@ public class Main extends JavaPlugin {
     private ConfigManager configManager;
     private GameManager gameManager;
     private CommandManager commandManager;
-    private MessageMethods messageMethods;
+    private PlMessageMethods plMessageMethods;
+    private KitMenu kitMenu;
 
     private WorldEditPlugin worldEditPlugin;
     private String prefix;
-    private HashMap<UUID, PlayerManager> playerManager = new HashMap<>();
+    private Map<UUID, PlayerManager> playerManager = new HashMap<>();
+    private Map<String, KitMain> kitManager = new HashMap<>();
 
     public void onEnable() {
         saveDefaultConfig();
 
         registerClasses();
         registerListeners();
+        setupKits();
 
         gameManager.checkValidArenas();
         gameManager.chooseRandomArena();
 
-        Bukkit.getWorld(getConfig().getString("world")).setAutoSave(false);
-        for (World world : Bukkit.getWorlds()) {
-            world.setGameRuleValue("doMobSpawning", "false");
-            world.setGameRuleValue("announceAdvancements", "false");
-            world.setGameRuleValue("doDaylightCycle", "false");
-            world.setGameRuleValue("doWeatherCycle", "false");
-            for (Entity entity : world.getEntities()) {
-                entity.remove();
-            }
-        }
+        setupWorld();
 
     }
 
     public void onDisable() {
 
-        //TODO future: send players to lobby
+        //TODO feature: send players to lobby
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (gameManager.getGameState().equals(GameState.FINISHED)) {
                 player.kickPlayer(getPrefix() + ChatColor.GOLD + "The game has ended!");
@@ -86,10 +80,11 @@ public class Main extends JavaPlugin {
         gameManager = new GameManager();
         commandManager = new CommandManager();
         commandManager.setup();
-        messageMethods = new MessageMethods();
+        plMessageMethods = new PlMessageMethods();
+        kitMenu = new KitMenu();
 
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
-        this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new MessageListener());
+        this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new PlMessageListener());
 
     }
 
@@ -99,7 +94,28 @@ public class Main extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new QuitListener(), this);
         getServer().getPluginManager().registerEvents(new EntityDamageListener(), this);
         getServer().getPluginManager().registerEvents(new UtilityListeners(), this);
+        getServer().getPluginManager().registerEvents(new KitListener(), this);
 
+    }
+
+    private void setupKits() {
+        for (String kitName : configManager.getKitConfig().getConfigurationSection("kits").getKeys(false)) {
+            kitManager.put(kitName, new KitMain(kitName));
+            kitManager.get(kitName).setupKit();
+        }
+    }
+
+    private void setupWorld() {
+        Bukkit.getWorld(getConfig().getString("world")).setAutoSave(false);
+        for (World world : Bukkit.getWorlds()) {
+            world.setGameRuleValue("doMobSpawning", "false");
+            world.setGameRuleValue("announceAdvancements", "false");
+            world.setGameRuleValue("doDaylightCycle", "false");
+            world.setGameRuleValue("doWeatherCycle", "false");
+            for (Entity entity : world.getEntities()) {
+                entity.remove();
+            }
+        }
     }
 
 
@@ -131,8 +147,12 @@ public class Main extends JavaPlugin {
         return commandManager;
     }
 
-    public MessageMethods getMessageMethods() {
-        return messageMethods;
+    public PlMessageMethods getMessageMethods() {
+        return plMessageMethods;
+    }
+
+    public KitMenu getKitMenu() {
+        return kitMenu;
     }
 
     public WorldEditPlugin getWorldEditPlugin() {
@@ -143,7 +163,11 @@ public class Main extends JavaPlugin {
         return prefix;
     }
 
-    public HashMap<UUID, PlayerManager> getPlayerManager() {
+    public Map<UUID, PlayerManager> getPlayerManager() {
         return playerManager;
+    }
+
+    public Map<String, KitMain> getKitManager() {
+        return kitManager;
     }
 }

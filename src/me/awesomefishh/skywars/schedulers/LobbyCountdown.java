@@ -66,11 +66,13 @@ public class LobbyCountdown {
                                 arenaConfig.getDouble("arenas." + gameManager.getChosenArena() + ".spawns." + c + ".Y"),
                                 arenaConfig.getDouble("arenas." + gameManager.getChosenArena() + ".spawns." + c + ".Z"));
                         player.teleport(islandSpawn);
+                        player.getInventory().clear();
                         c++;
                     }
 
                     for (Player player : plugin.getGameManager().getPlayersSpectating()) {
                         player.teleport(plugin.getGameManager().getPlayersAlive().get(0));
+                        player.getInventory().clear();
                     }
                     gameManager.setGameState(GameState.INGAME);
                     this.cancel();

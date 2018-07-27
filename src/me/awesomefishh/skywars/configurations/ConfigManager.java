@@ -1,21 +1,23 @@
 package me.awesomefishh.skywars.configurations;
 
-import me.awesomefishh.skywars.Main;
 import org.bukkit.configuration.Configuration;
 
 public class ConfigManager {
 
-    private Main plugin;
     private ArenaConfig arenaConfig;
+    private KitConfig kitConfig;
 
     public ConfigManager() {
-        this.plugin = Main.getInstance();
         this.arenaConfig = new ArenaConfig();
+        this.kitConfig = new KitConfig();
     }
 
     public void setupConfigs() {
         arenaConfig.createConfig();
         arenaConfig.saveConfig();
+
+        kitConfig.createConfig();
+        kitConfig.saveDefaultConfig();
     }
 
 
@@ -25,6 +27,14 @@ public class ConfigManager {
 
     public void saveArenaConfig() {
         arenaConfig.saveConfig();
+    }
+
+    public Configuration getKitConfig() {
+        return kitConfig.getConfig();
+    }
+
+    public void saveKitConfig() {
+        kitConfig.saveDefaultConfig();
     }
 
 }

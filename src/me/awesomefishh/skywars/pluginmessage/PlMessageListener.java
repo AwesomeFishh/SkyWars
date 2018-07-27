@@ -10,11 +10,11 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-public class MessageListener implements PluginMessageListener {
+public class PlMessageListener implements PluginMessageListener {
 
     private Main plugin;
 
-    public MessageListener() {
+    public PlMessageListener() {
         plugin = Main.getInstance();
     }
 

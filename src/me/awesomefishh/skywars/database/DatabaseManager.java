@@ -1,6 +1,7 @@
 package me.awesomefishh.skywars.database;
 
 import me.awesomefishh.skywars.Main;
+import me.awesomefishh.skywars.kits.KitMain;
 import org.bukkit.entity.Player;
 
 import java.sql.*;
@@ -60,6 +61,10 @@ public class DatabaseManager {
         return "player_data";
     }
 
+    public String getKitTable() {
+        return "player_kits";
+    }
+
     public void checkPlayer(Player player) {
         try {
 
@@ -68,6 +73,21 @@ public class DatabaseManager {
             if (!rs.next()) {
                 PreparedStatement insertPlayer = getConnection().prepareStatement("INSERT INTO " + getPlayertable() + " (UUID,COINS,KILLS,WINS,GAMESPLAYED) VALUES ('" + player.getUniqueId() + "',0,0,0,0)");
                 insertPlayer.executeUpdate();
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        try {
+
+            for (KitMain kit : plugin.getKitManager().values()) {
+                PreparedStatement ps = getConnection().prepareStatement("SELECT * FROM " + getKitTable() + " WHERE UUID='" + player.getUniqueId() + "' AND KIT='" + kit.getName() + "'");
+                ResultSet rs = ps.executeQuery();
+                if (!rs.next()) {
+                    PreparedStatement insertPlayer = getConnection().prepareStatement("INSERT INTO " + getKitTable() + " (UUID,KIT,LEVEL) VALUES ('" + player.getUniqueId() + "','" + kit.getName() + "',1)");
+                    insertPlayer.executeUpdate();
+                }
             }
 
         } catch (SQLException e) {
